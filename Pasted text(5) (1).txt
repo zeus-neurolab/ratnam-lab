@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ratnam Lab — Neurophysiology · Ahmedabad University</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ===== AHMEDABAD UNIVERSITY DESIGN TOKENS ===== */
+  :root {
+    --maroon:       #6b1a2a;      /* AU primary maroon */
+    --maroon-deep:  #4a0f1c;      /* darker maroon for depth */
+    --maroon-mid:   #8b2438;      /* mid maroon */
+    --maroon-light: #b5364e;      /* accent maroon */
+    --gold:         #c9973a;      /* warm academic gold */
+    --gold-light:   #e8b96a;      /* lighter gold */
+    --off-white:    #faf8f5;      /* warm white — AU palette */
+    --cream:        #f2ede6;      /* parchment */
+    --warm-grey:    #d8d0c8;      /* warm border */
+    --text-dark:    #1a1008;      /* near-black for text */
+    --text-mid:     #5a4a3a;      /* mid text */
+    --text-light:   #8a7a6a;      /* muted text */
+    --card-bg:      rgba(250,248,245,0.92);
+    --border:       rgba(107,26,42,0.15);
+    --nav-h:        76px;
+    --font-disp:    'EB Garamond', serif;
+    --font-body:    'Inter', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--off-white);
+    color: var(--text-dark);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== CANVAS BACKGROUND ===== */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+    background: rgba(74,15,28,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--off-white);
+  }
+
+  .nav-logo-mark {
+    width: 42px;
+    height: 42px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-logo-text { line-height: 1.2; }
+  .nav-logo-text strong {
+    display: block;
+    font-family: var(--font-disp);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.02em;
+  }
+  .nav-logo-text span {
+    font-size: 0.68rem;
+    color: rgba(250,248,245,0.6);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.8rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: rgba(250,248,245,0.75);
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
+
+  .nav-burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .nav-burger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--off-white); border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  @media (max-width: 900px) {
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: var(--maroon-deep);
+      padding: 1.5rem 5vw;
+      gap: 1.2rem;
+      border-bottom: 2px solid var(--gold);
+    }
+    .nav-links.open { display: flex; }
+    .nav-burger { display: flex; }
+  }
+
+  /* ===== SECTIONS BASE ===== */
+  section { position: relative; z-index: 1; }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: calc(var(--nav-h) + 5rem) 5vw 5rem;
+    background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 60%, var(--maroon-mid) 100%);
+    overflow: hidden;
+  }
+
+  .hero-inner { max-width: 700px; position: relative; z-index: 2; }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 1.5rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: var(--font-disp);
+    font-size: clamp(3rem, 6.5vw, 5.5rem);
+    line-height: 1.05;
+    color: var(--off-white);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-disp);
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    font-style: italic;
+    color: rgba(250,248,245,0.65);
+    margin-bottom: 2rem;
+  }
+
+  .hero-body {
+    font-size: 1rem;
+    color: rgba(250,248,245,0.75);
+    max-width: 580px;
+    margin-bottom: 2.8rem;
+    line-height: 1.85;
+  }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    padding: 0.8rem 2rem;
+    background: var(--gold);
+    color: var(--maroon-deep);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    padding: 0.8rem 2rem;
+    background: transparent;
+    color: var(--gold-light);
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid rgba(201,151,58,0.5);
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { background: rgba(201,151,58,0.1); border-color: var(--gold); transform: translateY(-1px); }
+
+  /* Hero wave decoration */
+  .hero-wave-deco {
+    position: absolute;
+    right: -2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.18;
+    pointer-events: none;
+  }
+  @media (max-width: 860px) { .hero-wave-deco { display: none; } }
+
+  /* AU badge on hero */
+  .au-badge {
+    position: absolute;
+    bottom: 3rem;
+    right: 5vw;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.5;
+  }
+  .au-badge span { font-size: 0.7rem; color: var(--gold-light); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* ===== ABOUT ===== */
+  #about {
+    padding: 7rem 5vw;
+    background: var(--off-white);
+  }
+  .about-grid {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; gap: 3rem; } }
+
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--maroon-light);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--maroon-light);
+    display: block;
+  }
+
+  .section-title {
+    font-family: var(--font-disp);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1.15;
+    margin-bottom: 1.4rem;
+    color: var(--maroon-deep);
+    font-weight: 500;
+  }
+  .section-body {
+    color: var(--text-mid);
+    font-size: 0.97rem;
+    line-height: 1.9;
+  }
+
+  /* PI Profile Card */
+  .pi-card {
+    background: white;
+    border: 1px solid var(--warm-grey);
+    border-top: 4px solid var(--maroon);
+    border-radius: 4px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 24px rgba(107,26,42,0.08);
+  }
+  .pi-avatar {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, var(--maroon), var(--maroon-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-bottom: 1.4rem;
+  }
+  .pi-card h3 {
+    font-family: var(--font-disp);
+    font-size: 1.5rem;
+    color: var(--maroon-deep);
+    margin-bottom: 0.2rem;
+  }
+  .pi-card .pi-title { font-size: 0.82rem; color: var(--maroon-light); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+  .pi-card .pi-affil { font-size: 0.8rem; color: var(--text-light); margin-bottom: 1.2rem; }
+  .pi-card p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.8; margin-bottom: 0.8rem; }
+  .pi-contact { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--warm-grey); }
+  .pi-contact a { font-size: 0.82rem; color: var(--maroon); text-decoration: none; }
+  .pi-contact a:hover { color: var(--maroon-light); text-decoration: underline; }
+
+  /* Stats */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .stat-card {
+    padding: 1.4rem;
+    background: white;
+    border: 1px solid var(--warm-grey);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .stat-card strong {
+    display: block;
+    font-family: var(--font-disp);
+    font-size: 2.4rem;
+    color: var(--maroon);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+  }
+  .stat-card span { font-size: 0.75rem; color: var(--text-light); font-weight: 500; letter-spacing: 0.05em; }
+
+  /* ===== RESEARCH ===== */
+  #research {
+    padding: 7rem 5vw;
+    background: var(--cream);
+  }
+  .research-header {
+    max-width: 1140px;
+    margin: 0 auto 3.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--warm-grey);
+  }
+  .research-grid {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  .research-card {
+    background: white;
+    border: 1px solid var(--warm-grey);
+    border-radius: 4px;
+    padding: 2rem;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+  }
+  .research-card:hover {
+    border-color: var(--maroon);
+    box-shadow: 0 6px 28px rgba(107,26,42,0.1);
+    transform: translateY(-3px);
+  }
+  .rc-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 1.2rem;
+    background: rgba(107,26,42,0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .research-card h3 {
+    font-family: var(--font-disp);
+    font-size: 1.2rem;
+    margin-bottom: 0.7rem;
+    color: var(--maroon-deep);
+    font-weight: 500;
+  }
+  .research-card p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.75; }
+
+  /* ===== TEAM ===== */
+  #team {
+    padding: 7rem 5vw;
+    background: white;
+  }
+  .team-header { max-width: 1140px; margin: 0 auto 3.5rem; }
+  .team-grid {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+  .team-card {
+    background: var(--off-white);
+    border: 1px solid var(--warm-grey);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.2s, transform 0.2s;
+  }
+  .team-card:hover {
+    border-color: var(--maroon-light);
+    box-shadow: 0 6px 24px rgba(107,26,42,0.1);
+    transform: translateY(-3px);
+  }
+  .team-avatar {
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(135deg, var(--maroon-deep), var(--maroon));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+  }
+  .team-card-body { padding: 1.4rem; }
+  .team-card-body h4 { font-family: var(--font-disp); font-size: 1.1rem; font-weight: 500; color: var(--maroon-deep); margin-bottom: 0.2rem; }
+  .team-card-body .role { font-size: 0.75rem; color: var(--maroon-light); font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; display: block; margin-bottom: 0.6rem; }
+  .team-card-body p { font-size: 0.84rem; color: var(--text-mid); line-height: 1.6; }
+
+  /* ===== PUBLICATIONS ===== */
+  #publications {
+    padding: 7rem 5vw;
+    background: var(--cream);
+  }
+  .pubs-header { max-width: 1140px; margin: 0 auto 1rem; }
+  .pubs-filter {
+    max-width: 1140px;
+    margin: 0 auto 2.5rem;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .pubs-filter button {
+    padding: 0.35rem 0.9rem;
+    background: transparent;
+    border: 1px solid var(--warm-grey);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .pubs-filter button:hover,
+  .pubs-filter button.active {
+    background: var(--maroon);
+    border-color: var(--maroon);
+    color: white;
+  }
+  .pub-list { max-width: 1140px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.8rem; }
+  .pub-item {
+    padding: 1.5rem 1.8rem;
+    background: white;
+    border: 1px solid var(--warm-grey);
+    border-left: 3px solid var(--maroon);
+    border-radius: 0 4px 4px 0;
+    transition: border-left-color 0.2s, box-shadow 0.2s;
+  }
+  .pub-item:hover { border-left-color: var(--gold); box-shadow: 0 3px 14px rgba(107,26,42,0.07); }
+  .pub-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem; }
+  .pub-year { font-size: 0.72rem; font-weight: 700; color: var(--gold); letter-spacing: 0.1em; background: rgba(201,151,58,0.1); padding: 0.15rem 0.5rem; border-radius: 3px; }
+  .pub-tag { font-size: 0.68rem; font-weight: 600; color: var(--maroon); background: rgba(107,26,42,0.07); padding: 0.15rem 0.5rem; border-radius: 3px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .pub-title { font-family: var(--font-disp); font-weight: 500; color: var(--maroon-deep); margin-bottom: 0.3rem; font-size: 1rem; line-height: 1.5; }
+  .pub-authors { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 0.2rem; }
+  .pub-authors strong { color: var(--maroon); }
+  .pub-journal { font-size: 0.8rem; color: var(--text-light); font-style: italic; }
+
+  /* ===== NEWS ===== */
+  #news {
+    padding: 7rem 5vw;
+    background: white;
+  }
+  .news-header { max-width: 1140px; margin: 0 auto 3.5rem; }
+  .news-grid {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  .news-card {
+    background: var(--off-white);
+    border: 1px solid var(--warm-grey);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .news-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(107,26,42,0.1); }
+  .news-thumb {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, var(--maroon-deep), var(--maroon-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+  }
+  .news-body { padding: 1.4rem; }
+  .news-date { font-size: 0.7rem; color: var(--gold); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .news-body h4 { font-family: var(--font-disp); font-size: 1rem; font-weight: 500; color: var(--maroon-deep); margin-bottom: 0.5rem; line-height: 1.45; }
+  .news-body p { font-size: 0.84rem; color: var(--text-mid); line-height: 1.65; }
+
+  /* ===== JOIN US ===== */
+  #join {
+    padding: 7rem 5vw;
+    background: var(--maroon-deep);
+  }
+  .join-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .join-inner { grid-template-columns: 1fr; gap: 3rem; } }
+  .join-inner .section-label { color: var(--gold-light); }
+  .join-inner .section-label::before { background: var(--gold-light); }
+  .join-inner .section-title { color: var(--off-white); }
+  .join-inner .section-body { color: rgba(250,248,245,0.7); }
+
+  .openings { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 2rem; }
+  .opening-item {
+    padding: 1.2rem 1.5rem;
+    background: rgba(250,248,245,0.05);
+    border: 1px solid rgba(250,248,245,0.12);
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .opening-item:hover { background: rgba(201,151,58,0.08); border-color: rgba(201,151,58,0.3); }
+  .opening-item h4 { font-size: 0.92rem; font-weight: 600; color: var(--off-white); }
+  .opening-item span { font-size: 0.77rem; color: rgba(250,248,245,0.5); }
+  .tag {
+    padding: 0.25rem 0.65rem;
+    background: rgba(201,151,58,0.15);
+    color: var(--gold-light);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid rgba(201,151,58,0.3);
+  }
+  .tag.open {
+    background: rgba(34,197,94,0.12);
+    color: #6ee7a0;
+    border-color: rgba(34,197,94,0.3);
+  }
+
+  .skills-list { list-style: none; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.7rem; }
+  .skills-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    color: rgba(250,248,245,0.65);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .skills-list li::before { content: '—'; color: var(--gold); flex-shrink: 0; margin-top: 0.05rem; }
+
+  /* ===== CONTACT ===== */
+  #contact {
+    padding: 7rem 5vw;
+    background: var(--off-white);
+  }
+  .contact-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .contact-inner { grid-template-columns: 1fr; } }
+  .contact-detail { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.8rem; }
+  .contact-icon {
+    width: 38px; height: 38px;
+    background: rgba(107,26,42,0.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .contact-detail h5 {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--maroon-light);
+    margin-bottom: 0.3rem;
+  }
+  .contact-detail p { font-size: 0.9rem; color: var(--text-mid); }
+  .contact-detail a { color: var(--maroon); text-decoration: none; }
+  .contact-detail a:hover { text-decoration: underline; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .contact-form input,
+  .contact-form textarea {
+    background: white;
+    border: 1px solid var(--warm-grey);
+    color: var(--text-dark);
+    padding: 0.85rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .contact-form input:focus,
+  .contact-form textarea:focus { border-color: var(--maroon); }
+  .contact-form textarea { min-height: 130px; resize: vertical; }
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder { color: var(--text-light); }
+  #form-msg { font-size: 0.83rem; color: #2d9e5f; display: none; text-align: center; margin-top: 0.5rem; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 2.5rem 5vw;
+    background: var(--maroon-deep);
+    border-top: 2px solid var(--gold);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer p { font-size: 0.78rem; color: rgba(250,248,245,0.5); }
+  footer a { color: var(--gold-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .footer-links { display: flex; gap: 1.5rem; }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ===== BACK TO TOP ===== */
+  #back-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 44px; height: 44px;
+    background: var(--maroon);
+    color: var(--off-white);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.2s;
+    font-size: 1rem;
+  }
+  #back-top:hover { background: var(--maroon-mid); }
+  #back-top.visible { opacity: 1; }
+
+  /* Divider */
+  .section-divider {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 0 2.5rem;
+    border-bottom: 1px solid var(--warm-grey);
+    margin-bottom: 3.5rem;
+  }
+
+  /* Quote block */
+  .pi-quote {
+    font-family: var(--font-disp);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--maroon);
+    border-left: 3px solid var(--gold);
+    padding: 1rem 1.5rem;
+    margin: 2rem 0;
+    line-height: 1.7;
+    background: rgba(201,151,58,0.04);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Collab tags */
+  .collabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+  .collab-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--maroon);
+    background: rgba(107,26,42,0.07);
+    border: 1px solid rgba(107,26,42,0.15);
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a0f1c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3,12 L5,12 L7,6 L9,18 L11,10 L13,14 L15,12 L21,12"/>
+      </svg>
+    </div>
+    <div class="nav-logo-text">
+      <strong>Ratnam Lab · Neurophysiology</strong>
+      <span>Ahmedabad University</span>
+    </div>
+  </a>
+
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#join">Join Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <button class="nav-burger" id="nav-burger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <!-- EEG Waveform decoration -->
+  <svg class="hero-wave-deco" width="560" height="180" viewBox="0 0 560 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polyline
+      points="0,90 44,90 60,90 65,22 70,158 75,78 100,90 144,90 160,90 165,28 170,152 175,82 200,90 244,90 260,90 265,24 270,156 275,80 300,90 344,90 360,90 365,26 370,154 375,80 400,90 444,90 460,90 465,22 470,158 475,78 500,90 544,90 560,90"
+      stroke="rgba(201,151,58,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <animate attributeName="stroke-dasharray" from="0 2000" to="2000 0" dur="4s" fill="freeze"/>
+    </polyline>
+    <path d="M0,130 Q30,120 60,130 Q90,140 120,126 Q150,112 180,130 Q210,148 240,130 Q270,112 300,128 Q330,144 360,130 Q390,116 420,130 Q450,144 480,132 Q510,120 540,130"
+      stroke="rgba(250,248,245,0.15)" stroke-width="1.5" fill="none"/>
+  </svg>
+
+  <div class="hero-inner reveal">
+    <div class="hero-eyebrow">Ratnam Lab · School of Arts &amp; Sciences · Ahmedabad University</div>
+    <h1 class="hero-title">Decoding the<br><em>Electric Brain</em></h1>
+    <p class="hero-subtitle">Neural coding, sensory signal processing &amp; auditory neuroethology</p>
+    <p class="hero-body">
+      We investigate how nervous systems encode, detect, and compute information from the world — 
+      from the exquisite electrosensory circuits of weakly electric fish to human auditory processing 
+      and cochlear implant speech coding. Our work bridges comparative neurophysiology, 
+      computational neuroscience, and biomedical engineering.
+    </p>
+    <div class="hero-ctas">
+      <a href="#research" class="btn-primary">Explore Research</a>
+      <a href="#join" class="btn-ghost">Join the Lab</a>
+    </div>
+  </div>
+
+  <div class="au-badge">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="rgba(201,151,58,0.5)" stroke-width="1"/><text x="14" y="19" text-anchor="middle" font-size="10" font-weight="700" fill="rgba(201,151,58,0.7)" font-family="EB Garamond, serif">AU</text></svg>
+    <span>Est. 2019 · Ahmedabad, India</span>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <div class="about-grid">
+    <div class="reveal">
+      <div class="section-label">About the Lab</div>
+      <h2 class="section-title">Where Biology Meets Bioelectricity</h2>
+      <p class="section-body">
+        The Ratnam Neurophysiology Laboratory at Ahmedabad University is dedicated to understanding 
+        how nervous systems generate, encode, and interpret signals from the environment. We work across 
+        multiple model systems — weakly electric fish (<em>Apteronotus leptorhynchus</em>), 
+        chorusing frogs and toads, songbirds, and humans — to uncover conserved and divergent 
+        principles of neural computation.
+      </p>
+      <div class="pi-quote">
+        "Biological mechanisms, which are a result of natural selection, reach theoretical performance 
+        bounds predicted by mathematical and engineering analysis. Selection and optimal design are one 
+        and the same." — Prof. Rama Ratnam
+      </div>
+      <p class="section-body">
+        A core theme is the idea that evolution has converged to neural codes operating near 
+        the theoretical limits of performance — codes that are both high-fidelity and energy-efficient. 
+        This principle has profound implications for understanding brain function and for developing 
+        next-generation cochlear implants and neural prosthetics.
+      </p>
+      <div class="stat-grid">
+        <div class="stat-card"><strong>30+</strong><span>Peer-Reviewed Publications</span></div>
+        <div class="stat-card"><strong>3</strong><span>Active Research Themes</span></div>
+        <div class="stat-card"><strong>2019</strong><span>Established at AU</span></div>
+        <div class="stat-card"><strong>3</strong><span>Countries Collaborated</span></div>
+      </div>
+    </div>
+
+    <!-- PI Card -->
+    <div class="pi-card reveal">
+      <div class="pi-avatar">🧬</div>
+      <h3>Prof. Rama Ratnam</h3>
+      <div class="pi-title">Professor &amp; Dean, Graduate School and Research</div>
+      <div class="pi-affil">School of Arts &amp; Sciences · Biological &amp; Life Sciences<br>Ahmedabad University, Gujarat, India</div>
+      <p>
+        Neuroscientist with broad interests in brain and behaviour, with particular focus on neurobiological 
+        mechanisms of sensory processing — especially audition and electrosense in weakly electric fish. 
+        PhD from University of Illinois at Urbana-Champaign; formerly faculty at University of Texas at 
+        San Antonio and Senior Scientist at UIUC.
+      </p>
+      <p>
+        Engineering roots from IIT Delhi deeply influence a conviction that optimal neural design is the 
+        product of natural selection — provable, measurable, and applicable to neural implants.
+      </p>
+      <div class="collabs">
+        <span class="collab-tag">UIUC · Prof. Douglas L. Jones</span>
+        <span class="collab-tag">Johns Hopkins · Dr. Erik Johnson</span>
+        <span class="collab-tag">UIUC · Prof. Justin Aronoff</span>
+        <span class="collab-tag">Nat'l Univ. Singapore · Prof. Stefan Winkler</span>
+      </div>
+      <div class="pi-contact">
+        <a href="mailto:rama.ratnam@ahduni.edu.in">✉ rama.ratnam@ahduni.edu.in</a>
+        <a href="tel:+917961911260">☏ +91.79.61911260</a>
+        <a href="https://ahduni.edu.in/faculty/rama-ratnam/" target="_blank">↗ Faculty Profile, Ahmedabad University</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESEARCH ===== -->
+<section id="research">
+  <div class="research-header reveal">
+    <div>
+      <div class="section-label">What We Study</div>
+      <h2 class="section-title">Research Focus Areas</h2>
+    </div>
+    <a href="#publications" class="btn-ghost" style="color:var(--maroon); border-color:var(--maroon); font-size:0.78rem;">See Publications →</a>
+  </div>
+  <div class="research-grid">
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><path d="M3,12 L6,12 L8,6 L10,18 L12,10 L14,14 L16,12 L21,12"/></svg>
+      </div>
+      <h3>Electrosensory Neurophysiology</h3>
+      <p>Studying how weakly electric fish (<em>Apteronotus leptorhynchus</em>, wave-type electric fish) encode and process electric organ discharges — a model system for active sensing circuits and optimal neural coding. A core aim is testing the source-coding hypothesis: that neurons minimize energy while maximizing coding fidelity.</p>
+    </div>
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><path d="M12,3 Q18,3 21,9 Q21,15 15,18 Q12,21 9,18 Q3,15 3,9 Q6,3 12,3Z"/><path d="M8,10 Q10,7 12,10 Q14,13 16,10"/></svg>
+      </div>
+      <h3>Optimal Neural Coding Theory</h3>
+      <p>A neuron operating at fixed metabolic energy must trade off energy against coding fidelity. Prof. Ratnam &amp; collaborators show that a single potassium M-current is the key biophysical regulator of this optimal code — producing spike-timing statistics that maximize signal detection and estimation performance.</p>
+    </div>
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><ellipse cx="12" cy="12" rx="9" ry="6"/><path d="M3,12 Q6,16 12,16 Q18,16 21,12"/><circle cx="12" cy="10" r="1.5" fill="#6b1a2a"/></svg>
+      </div>
+      <h3>Anuran Vocal Communication</h3>
+      <p>Investigating male-male interactions in chorusing frogs — how callers synchronize, alternate antiphonally, and track neighbors using phase-hopping. Using microphone array beamforming to localize and separate individual frog voices in the dark, and studying how frog auditory midbrain neurons detect signals in noise.</p>
+    </div>
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><path d="M3,12 L5,12 L7,5 L9,19 L11,10 L13,14 L15,12 L17,6 L19,18 L21,12"/></svg>
+      </div>
+      <h3>Sound Localization &amp; Auditory Neuroethology</h3>
+      <p>Exploring how human listeners process and localize complex acoustic signals — including synthetic narrowband frog calls. Research by lab member Hemal Faizpurkar shows systematic human errors in locating frog calls, revealing evolutionary pressures shaping vocal communication signal design.</p>
+    </div>
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3,9 L21,9"/><circle cx="8" cy="13" r="1.5" fill="#6b1a2a"/><circle cx="12" cy="13" r="1.5" fill="#6b1a2a"/><circle cx="16" cy="13" r="1.5" fill="#6b1a2a"/></svg>
+      </div>
+      <h3>Cochlear Implant Speech Coding</h3>
+      <p>Applying the optimal neural spike-timing code to develop improved speech vocoders for cochlear implants. Preliminary results show improved binaural and directional hearing in vocoder simulations. Particularly relevant for India's large pediatric hearing-loss population, where cochlear implant penetration remains low.</p>
+    </div>
+
+    <div class="research-card reveal">
+      <div class="rc-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4,20 Q4,14 12,14 Q20,14 20,20"/><path d="M3,7 Q5,5 7,7"/><path d="M17,7 Q19,5 21,7"/></svg>
+      </div>
+      <h3>EEG, Task-Load &amp; Human Performance</h3>
+      <p>Multimodal physiological recordings (ERP/EEG, eye-tracking, galvanic skin response) to assess cognitive task-load in work environments. Combining these signals in linear regression models to predict performance under varying task demand — with implications for human-computer interaction and workplace safety.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== TEAM ===== -->
+<section id="team">
+  <div class="team-header reveal">
+    <div class="section-label">The People</div>
+    <h2 class="section-title">Lab Members</h2>
+    <p class="section-body" style="max-width:580px; margin-top:0.6rem; color:var(--text-mid);">A multidisciplinary team spanning neurobiology, audiology, biomedical engineering, and computational neuroscience.</p>
+  </div>
+  <div class="team-grid">
+
+    <div class="team-card reveal">
+      <div class="team-avatar">🧬</div>
+      <div class="team-card-body">
+        <h4>Prof. Rama Ratnam</h4>
+        <span class="role">Principal Investigator · Professor &amp; Dean</span>
+        <p>PhD, University of Illinois at Urbana-Champaign. Research on neural coding, electrosensory physiology, auditory neuroscience, and cochlear implants. Formerly at UTSA and UIUC.</p>
+      </div>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">🦻</div>
+      <div class="team-card-body">
+        <h4>Hemal Faizpurkar</h4>
+        <span class="role">Researcher · Auditory Neuroethology</span>
+        <p>Focus on auditory neuroethology, sound localization, and human processing of synthetic frog calls. Published in <em>J. Comparative Physiology A</em> with Prof. Ratnam and Prof. Douglas L. Jones (UIUC). Also working on auditory sensitivity and inner-ear acoustics.</p>
+      </div>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">📡</div>
+      <div class="team-card-body">
+        <h4>Open Position</h4>
+        <span class="role">PhD Candidate</span>
+        <p>Electrosensory neural coding in weakly electric fish. We are actively seeking candidates with backgrounds in neuroscience, biology, physics, or engineering.</p>
+      </div>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">⚡</div>
+      <div class="team-card-body">
+        <h4>Open Position</h4>
+        <span class="role">M.Sc. Student</span>
+        <p>Anuran vocal communication and auditory midbrain physiology. Ideal for students with interest in behavioural ecology, bioacoustics, or signal processing.</p>
+      </div>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">🐟</div>
+      <div class="team-card-body">
+        <h4>Open Position</h4>
+        <span class="role">Postdoctoral Researcher</span>
+        <p>Optimal neural coding theory and cochlear implant applications. 2-year appointment. Strong quantitative background required — biology, physics, or engineering welcome.</p>
+      </div>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">🎓</div>
+      <div class="team-card-body">
+        <h4>Undergrad Researchers</h4>
+        <span class="role">Research Interns</span>
+        <p>Ahmedabad University undergraduates with curiosity about brain, signals, and computation. Summer and semester positions available. No prior lab experience required.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== PUBLICATIONS ===== -->
+<section id="publications">
+  <div class="pubs-header reveal">
+    <div class="section-label">Scholarly Output</div>
+    <h2 class="section-title">Selected Publications</h2>
+    <p class="section-body" style="margin-top:0.5rem; color:var(--text-mid);">Representative work from the lab. <strong style="color:var(--maroon)">Ratnam</strong> denotes PI authorship. Full list on <a href="https://ahduni.edu.in/faculty/rama-ratnam/" style="color:var(--maroon); text-decoration:underline;" target="_blank">faculty profile</a>.</p>
+  </div>
+
+  <div class="pubs-filter reveal">
+    <button class="active" onclick="filterPubs('all', this)">All</button>
+    <button onclick="filterPubs('electrosensory', this)">Electrosensory</button>
+    <button onclick="filterPubs('auditory', this)">Auditory</button>
+    <button onclick="filterPubs('coding', this)">Neural Coding</button>
+    <button onclick="filterPubs('anuran', this)">Anuran</button>
+    <button onclick="filterPubs('implant', this)">Cochlear Implants</button>
+  </div>
+
+  <div class="pub-list" id="pub-list">
+
+    <div class="pub-item reveal" data-topic="auditory">
+      <div class="pub-meta">
+        <span class="pub-year">2023 (approx.)</span>
+        <span class="pub-tag">Sound Localization</span>
+      </div>
+      <div class="pub-title">Confusion and human errors in locating synthetic frog calls: Insights into the evolution of a vocal communication signal</div>
+      <div class="pub-authors">Faizpurkar H, Jones DL, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of Comparative Physiology A</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="auditory">
+      <div class="pub-meta">
+        <span class="pub-year">2023 (approx.)</span>
+        <span class="pub-tag">Auditory Sensitivity</span>
+      </div>
+      <div class="pub-title">ICE on the road to auditory sensitivity reduction and sound [localization]</div>
+      <div class="pub-authors">Faizpurkar H, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of Comparative Physiology A</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="coding">
+      <div class="pub-meta">
+        <span class="pub-year">2016</span>
+        <span class="pub-tag">Neural Coding</span>
+      </div>
+      <div class="pub-title">A minimum-error, energy-constrained neural code is an instantaneous rate-code</div>
+      <div class="pub-authors">Johnson EC, Jones DL, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of Computational Neuroscience · 40:193–206</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="coding">
+      <div class="pub-meta">
+        <span class="pub-year">2015</span>
+        <span class="pub-tag">Neural Coding</span>
+      </div>
+      <div class="pub-title">A stimulus-dependent spike threshold is an optimal neural coder</div>
+      <div class="pub-authors">Jones DL, Johnson EC, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Frontiers in Computational Neuroscience · 9:61</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="anuran">
+      <div class="pub-meta">
+        <span class="pub-year">2014</span>
+        <span class="pub-tag">Anuran Chorusing</span>
+      </div>
+      <div class="pub-title">Calling dynamics and call synchronization in a local group of unison bout callers</div>
+      <div class="pub-authors">Jones DL, Jones RL, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of Comparative Physiology A · 200:93–107</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="auditory">
+      <div class="pub-meta">
+        <span class="pub-year">2011</span>
+        <span class="pub-tag">Auditory Neuroscience</span>
+      </div>
+      <div class="pub-title">Increased activation of the human cerebellum during pitch discrimination: A Positron Emission Tomography (PET) study</div>
+      <div class="pub-authors">Petacchi A, Kaernbach C, <strong>Ratnam R</strong>, Bower JM</div>
+      <div class="pub-journal">Hearing Research · 282:35–48</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="auditory">
+      <div class="pub-meta">
+        <span class="pub-year">2011</span>
+        <span class="pub-tag">OAE / Marmoset</span>
+      </div>
+      <div class="pub-title">Reliability of distortion product otoacoustic emissions in the common marmoset (<em>Callithrix jacchus</em>)</div>
+      <div class="pub-authors">Valero MD, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Hearing Research · 282:265–271</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="anuran auditory">
+      <div class="pub-meta">
+        <span class="pub-year">2009</span>
+        <span class="pub-tag">Bioacoustics</span>
+      </div>
+      <div class="pub-title">Blind location and separation of callers in a natural chorus using a microphone array</div>
+      <div class="pub-authors">Jones DL, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of the Acoustical Society of America · 126(2):895–910</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="electrosensory coding">
+      <div class="pub-meta">
+        <span class="pub-year">2003</span>
+        <span class="pub-tag">Electrosensory</span>
+      </div>
+      <div class="pub-title">Continuous detection of weak sensory signals in afferent spike trains: The role of anti-correlated interspike intervals</div>
+      <div class="pub-authors">Goense JBM, <strong>Ratnam R</strong></div>
+      <div class="pub-journal">Journal of Comparative Physiology A · 189(10):741–759</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="electrosensory coding">
+      <div class="pub-meta">
+        <span class="pub-year">2000</span>
+        <span class="pub-tag">Electrosensory</span>
+      </div>
+      <div class="pub-title">Non-renewal statistics of electrosensory afferent spike trains: implications for the detection of weak sensory signals</div>
+      <div class="pub-authors"><strong>Ratnam R</strong>, Nelson ME</div>
+      <div class="pub-journal">Journal of Neuroscience · 20(17):6672–6683</div>
+    </div>
+
+    <div class="pub-item reveal" data-topic="auditory">
+      <div class="pub-meta">
+        <span class="pub-year">1998</span>
+        <span class="pub-tag">Auditory Midbrain</span>
+      </div>
+      <div class="pub-title">Detection of auditory signals by frog inferior collicular neurons in the presence of spatially separated noise</div>
+      <div class="pub-authors"><strong>Ratnam R</strong>, Feng AS</div>
+      <div class="pub-journal">Journal of Neurophysiology · 80:2848–2859</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== NEWS ===== -->
+<section id="news">
+  <div class="news-header reveal">
+    <div class="section-label">Latest Updates</div>
+    <h2 class="section-title">Lab News</h2>
+  </div>
+  <div class="news-grid">
+
+    <div class="news-card reveal">
+      <div class="news-thumb">🦻</div>
+      <div class="news-body">
+        <div class="news-date">2023</div>
+        <h4>New Research on Human Sound Localization of Frog Calls Published</h4>
+        <p>Hemal Faizpurkar, Prof. Ratnam, and Prof. Douglas Jones (UIUC) publish findings on systematic human errors in locating synthetic narrowband frog calls — revealing evolutionary design pressures on anuran vocal communication. Published in <em>J. Comparative Physiology A</em>.</p>
+      </div>
+    </div>
+
+    <div class="news-card reveal">
+      <div class="news-thumb">🎙️</div>
+      <div class="news-body">
+        <div class="news-date">2019 — Ongoing</div>
+        <h4>Lab Established at Ahmedabad University</h4>
+        <p>Prof. Rama Ratnam joins Ahmedabad University as Professor and Dean of Graduate School and Research, bringing his neuroscience programme from the University of Illinois. Research on optimal neural coding, electrosensory physiology, and auditory neuroethology continues here.</p>
+      </div>
+    </div>
+
+    <div class="news-card reveal">
+      <div class="news-thumb">⚡</div>
+      <div class="news-body">
+        <div class="news-date">Ongoing</div>
+        <h4>Cochlear Implant Speech Vocoder Project — Seeking Collaborators</h4>
+        <p>Applying the spike-timing optimal neural code to cochlear implant speech processors. Preliminary vocoder tests on normal listeners show improved binaural performance and directional hearing. The lab is actively seeking partners among audiology clinics and implant manufacturers in India.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== JOIN US ===== -->
+<section id="join">
+  <div class="join-inner">
+    <div class="reveal">
+      <div class="section-label">Opportunities</div>
+      <h2 class="section-title">Join Our Team</h2>
+      <p class="section-body">We welcome motivated students and researchers with backgrounds in neuroscience, biology, biomedical engineering, audiology, physics, computer science, or psychology. Prof. Ratnam explicitly encourages applicants from engineering who are curious about how the brain solves hard computational problems.</p>
+      <p class="section-body" style="margin-top:1rem;">All research projects are multidisciplinary — you can choose a purely experimental, purely computational, or hybrid approach. Send a CV and brief statement of interest to the lab email.</p>
+      <div class="openings">
+        <div class="opening-item">
+          <div><h4>Postdoctoral Researcher</h4><span>Neural Coding / Cochlear Implants · 2-year position</span></div>
+          <span class="tag open">Open</span>
+        </div>
+        <div class="opening-item">
+          <div><h4>Ph.D. Candidate</h4><span>Electrosensory Neurophysiology · Ahmedabad University</span></div>
+          <span class="tag open">Open</span>
+        </div>
+        <div class="opening-item">
+          <div><h4>M.Sc. Student</h4><span>Auditory Neuroethology / Anuran Bioacoustics</span></div>
+          <span class="tag open">Open</span>
+        </div>
+        <div class="opening-item">
+          <div><h4>Undergraduate Research Intern</h4><span>Semester / Summer · AU students priority</span></div>
+          <span class="tag">Enquire</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="section-label">Lab Culture</div>
+      <h2 class="section-title" style="font-size:2rem;">What You'll Learn</h2>
+      <p class="section-body">Weekly lab meetings, journal clubs on sensory neuroscience and neural coding theory, and direct hands-on training in:</p>
+      <ul class="skills-list">
+        <li>In-vivo extracellular electrophysiology in weakly electric fish (P-type afferents, ELL recordings)</li>
+        <li>Anuran field bioacoustics &amp; midbrain recording</li>
+        <li>Microphone array localization &amp; adaptive beamforming</li>
+        <li>Human EEG / auditory evoked potential (ERP/ABR) recording</li>
+        <li>Speech vocoder design &amp; cochlear implant simulation</li>
+        <li>Otoacoustic emissions (OAE) &amp; audiometry</li>
+        <li>MATLAB / Python signal processing &amp; computational modelling</li>
+        <li>Information theory &amp; statistical neuroscience</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <div class="section-label">Find Us</div>
+      <h2 class="section-title">Get in Touch</h2>
+      <p class="section-body" style="margin-bottom:2.5rem;">Whether you're a prospective student, an audiologist interested in the cochlear implant project, or a fellow researcher — reach out.</p>
+
+      <div class="contact-detail">
+        <div class="contact-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="2"><path d="M3,3 L21,3 L21,17 Q21,19 19,19 L5,19 Q3,19 3,17Z"/><polyline points="3,3 12,13 21,3"/></svg>
+        </div>
+        <div>
+          <h5>Email</h5>
+          <p><a href="mailto:rama.ratnam@ahduni.edu.in">rama.ratnam@ahduni.edu.in</a></p>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <div class="contact-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="2"><path d="M22,16.92v3a2,2,0,0,1-2.18,2,19.79,19.79,0,0,1-8.63-3.07A19.5,19.5,0,0,1,4.72,12,19.79,19.79,0,0,1,1.65,3.39,2,2,0,0,1,3.62,1.22h3a2,2,0,0,1,2,1.72,12.84,12.84,0,0,0,.7,2.81,2,2,0,0,1-.45,2.11L7.91,8.85A16,16,0,0,0,15.15,16.1l.9-.9a2,2,0,0,1,2.11-.45,12.84,12.84,0,0,0,2.81.7A2,2,0,0,1,22,16.92Z"/></svg>
+        </div>
+        <div>
+          <h5>Phone</h5>
+          <p>+91.79.61911260</p>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <div class="contact-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <h5>Address</h5>
+          <p>Biological &amp; Life Sciences<br>School of Arts and Sciences<br>Ahmedabad University<br>Navrangpura, Ahmedabad 380009<br>Gujarat, India</p>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <div class="contact-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b1a2a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <h5>Office Hours</h5>
+          <p>Monday – Friday · 9:00 – 17:00 IST<br><span style="font-size:0.8rem; color:var(--text-light);">Email to schedule a meeting</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <form class="contact-form" onsubmit="handleFormSubmit(event)">
+        <input type="text" placeholder="Your name" required>
+        <input type="email" placeholder="Your email" required>
+        <input type="text" placeholder="Subject (e.g. PhD enquiry, Collaboration, Press)">
+        <textarea placeholder="Your message…" required></textarea>
+        <button type="submit" class="btn-primary" style="width:100%; text-align:center; padding:1rem;">Send Message</button>
+        <p id="form-msg">✓ Message sent — we'll be in touch soon!</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== */-->
+<footer>
+  <div>
+    <p style="font-family: 'EB Garamond', serif; font-size:0.9rem; color:rgba(250,248,245,0.7); margin-bottom:0.3rem;">Ratnam Neurophysiology Laboratory</p>
+    <p>© 2025 Ahmedabad University · All rights reserved · <a href="https://www.ahduni.edu.in" target="_blank">ahduni.edu.in</a></p>
+  </div>
+  <div class="footer-links">
+    <a href="https://www.ahduni.edu.in" target="_blank">Ahmedabad University</a>
+    <a href="https://ahduni.edu.in/faculty/rama-ratnam/" target="_blank">Faculty Profile</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+// ===== ANIMATED BACKGROUND: subtle electric fish swimming in warm parchment water =====
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, fish = [], ripples = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Fish {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = init ? Math.random() * W : -200;
+      this.y = 80 + Math.random() * (H - 160);
+      this.speed = 0.3 + Math.random() * 0.4;
+      this.amp = 8 + Math.random() * 12;
+      this.freq = 0.010 + Math.random() * 0.006;
+      this.phase = Math.random() * Math.PI * 2;
+      this.len = 110 + Math.random() * 50;
+      this.alpha = 0.04 + Math.random() * 0.06;
+      this.t = init ? Math.random() * 1000 : 0;
+      this.dir = Math.random() > 0.5 ? 1 : -1;
+      if (this.dir < 0) this.x = W + 200;
+    }
+    update() {
+      this.t++;
+      this.x += this.speed * this.dir;
+      if (this.dir > 0 && this.x > W + 250) this.reset(false);
+      if (this.dir < 0 && this.x < -250) { this.reset(false); this.dir = -1; this.x = W + 200; }
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.strokeStyle = '#6b1a2a';
+      ctx.lineWidth = 1.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      const segs = 24;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const frac = i / segs;
+        const sx = this.x + this.dir * i * (this.len / segs);
+        const taper = Math.sin(frac * Math.PI);
+        const sy = this.y + Math.sin(this.phase + this.t * this.freq - frac * 4) * this.amp * taper;
+        pts.push([sx, sy, taper]);
+      }
+      ctx.beginPath();
+      pts.forEach(([px,py], i) => i === 0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py));
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 5; i++) fish.push(new Fish());
+
+  let frame = 0;
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    // Very subtle background — mostly transparent so page background shows
+    ctx.fillStyle = 'rgba(250,248,245,0.0)';
+    ctx.fillRect(0, 0, W, H);
+    fish.forEach(f => { f.update(); f.draw(); });
+    frame++;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ===== NAV BURGER =====
+document.getElementById('nav-burger').addEventListener('click', function() {
+  document.getElementById('nav-links').classList.toggle('open');
+});
+
+// ===== SCROLL REVEAL =====
+const reveals = document.querySelectorAll('.reveal');
+const ro = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.08 });
+reveals.forEach(el => ro.observe(el));
+
+// ===== BACK TO TOP =====
+const backTop = document.getElementById('back-top');
+window.addEventListener('scroll', () => {
+  backTop.classList.toggle('visible', window.scrollY > 400);
+});
+
+// ===== FORM SUBMIT =====
+function handleFormSubmit(e) {
+  e.preventDefault();
+  const msg = document.getElementById('form-msg');
+  msg.style.display = 'block';
+  e.target.reset();
+  setTimeout(() => { msg.style.display = 'none'; }, 5000);
+}
+
+// ===== PUB FILTER =====
+function filterPubs(topic, btn) {
+  document.querySelectorAll('.pubs-filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pub-item').forEach(item => {
+    if (topic === 'all') {
+      item.style.display = '';
+    } else {
+      const topics = (item.dataset.topic || '').split(' ');
+      item.style.display = topics.some(t => t === topic) ? '' : 'none';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
